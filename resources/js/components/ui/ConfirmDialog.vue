@@ -14,7 +14,7 @@ defineEmits(['confirm', 'cancel']);
 
 <template>
     <BaseModal :open="open" :title="title" @close="$emit('cancel')">
-        <p class="text-sm text-slate-600">{{ message }}</p>
+        <p class="text-sm text-ink-soft">{{ message }}</p>
         <div class="mt-6 flex justify-end gap-2">
             <button type="button" class="btn btn-secondary" :disabled="processing" @click="$emit('cancel')">Cancel</button>
             <button type="button" class="btn btn-danger" :disabled="processing" @click="$emit('confirm')">

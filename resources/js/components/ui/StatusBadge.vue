@@ -9,14 +9,14 @@ const props = defineProps({
 
 const badge = computed(() => {
     if (props.status === 'completed') {
-        return { label: 'Completed', icon: 'check', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' };
+        return { label: 'Completed', icon: 'circleCheck', classes: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-400/30' };
     }
 
     if (props.overdue) {
-        return { label: 'Overdue', icon: 'alert', classes: 'bg-amber-50 text-amber-800 ring-amber-600/20' };
+        return { label: 'Overdue', icon: 'calendarX', classes: 'bg-amber-50 text-amber-800 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-400/30' };
     }
 
-    return { label: 'Active', icon: 'clock', classes: 'bg-sky-50 text-sky-700 ring-sky-600/20' };
+    return { label: 'Active', icon: 'trendingUp', classes: 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-300 dark:ring-sky-400/30' };
 });
 </script>
 

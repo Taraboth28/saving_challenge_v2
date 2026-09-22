@@ -49,7 +49,7 @@ const hovered = computed(() => arcs.value.find((arc) => arc.key === hoveredKey.v
     <div class="flex flex-col items-center gap-5 @md:flex-row @md:justify-center">
         <div class="relative shrink-0">
             <svg :width="size" :height="size" :viewBox="`0 0 ${size} ${size}`" role="img" :aria-label="ariaLabel" class="-rotate-90">
-                <circle :cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="#f1f5f9" :stroke-width="stroke" />
+                <circle :cx="size / 2" :cy="size / 2" :r="radius" fill="none" stroke="var(--color-surface-muted)" :stroke-width="stroke" />
                 <circle
                     v-for="arc in arcs"
                     :key="arc.key"
@@ -67,8 +67,8 @@ const hovered = computed(() => arcs.value.find((arc) => arc.key === hoveredKey.v
                 />
             </svg>
             <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span class="text-2xl font-semibold text-slate-900 tabular-nums">{{ hovered ? formatValue(hovered.value) : centerValue }}</span>
-                <span class="text-xs text-slate-500">{{ hovered ? `${hovered.label} · ${hovered.share}%` : centerLabel }}</span>
+                <span class="text-2xl font-semibold text-ink tabular-nums">{{ hovered ? formatValue(hovered.value) : centerValue }}</span>
+                <span class="text-xs text-ink-muted">{{ hovered ? `${hovered.label} · ${hovered.share}%` : centerLabel }}</span>
             </div>
         </div>
 
@@ -82,9 +82,9 @@ const hovered = computed(() => arcs.value.find((arc) => arc.key === hoveredKey.v
                 @mouseleave="hoveredKey = null"
             >
                 <span class="size-3 rounded-sm" :style="{ background: arc.color }" />
-                <span class="text-slate-600">{{ arc.label }}</span>
-                <span class="ml-auto pl-4 font-medium text-slate-900 tabular-nums">{{ formatValue(arc.value) }}</span>
-                <span class="w-10 text-right text-xs text-slate-500 tabular-nums">{{ arc.share }}%</span>
+                <span class="text-ink-soft">{{ arc.label }}</span>
+                <span class="ml-auto pl-4 font-medium text-ink tabular-nums">{{ formatValue(arc.value) }}</span>
+                <span class="w-10 text-right text-xs text-ink-muted tabular-nums">{{ arc.share }}%</span>
             </li>
         </ul>
     </div>

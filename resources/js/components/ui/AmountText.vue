@@ -14,7 +14,7 @@ const isWithdrawal = computed(() => props.type === 'withdrawal');
 </script>
 
 <template>
-    <span class="font-medium tabular-nums" :class="isWithdrawal ? 'text-rose-700' : 'text-emerald-700'">
+    <span class="font-medium tabular-nums" :class="isWithdrawal ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'">
         {{ isWithdrawal ? '−' : '+' }}{{ formatCurrency(amount) }}
     </span>
 </template>

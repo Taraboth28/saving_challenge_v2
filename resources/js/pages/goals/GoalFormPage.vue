@@ -35,7 +35,7 @@ function onSaved(goal) {
     <div class="mx-auto max-w-2xl">
         <PageHeader :title="isEditing ? 'Edit goal' : 'New savings goal'" :description="isEditing ? '' : 'Set a target amount and, optionally, a date to reach it.'">
             <template #back>
-                <button type="button" class="mb-2 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800" @click="goBack">
+                <button type="button" class="mb-2 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink" @click="goBack">
                     <AppIcon name="arrowLeft" :size="16" />
                     Back
                 </button>

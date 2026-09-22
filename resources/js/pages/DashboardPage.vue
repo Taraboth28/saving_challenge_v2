@@ -11,9 +11,12 @@ import ProgressBar from '../components/ui/ProgressBar.vue';
 import StatCard from '../components/ui/StatCard.vue';
 import StateMessage from '../components/ui/StateMessage.vue';
 import { useAsyncData } from '../composables/useAsyncData';
-import { formatCurrency, formatMonth, formatPercent } from '../utils/format';
+import { onDataChanged } from '../composables/useDataChanged';
+import { formatCurrency, formatMonth, formatPercent, pluralize } from '../utils/format';
 
 const { data: overview, loading, error, reload } = useAsyncData(() => dashboardApi.overview());
+
+onDataChanged(reload);
 
 const totals = computed(() => overview.value?.totals);
 
@@ -58,22 +61,22 @@ const topGoals = computed(() => [...(overview.value?.goal_progress ?? [])].sort(
     <div v-else-if="totals" class="flex flex-col gap-6">
         <!-- KPI tiles -->
         <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Summary">
-            <StatCard label="Total savings" :value="formatCurrency(totals.total_saved)" :hint="`${formatPercent(totals.overall_progress)} of all targets`" icon="wallet" />
-            <StatCard label="Total target" :value="formatCurrency(totals.total_target)" :hint="`Across ${totals.goals_count} goals`" icon="flag" />
-            <StatCard label="Remaining" :value="formatCurrency(totals.remaining)" hint="Still to save" icon="target" />
+            <StatCard label="Total savings" :value="formatCurrency(totals.total_saved)" :hint="`${formatPercent(totals.overall_progress)} of all targets`" icon="piggyBank" />
+            <StatCard label="Total target" :value="formatCurrency(totals.total_target)" :hint="`Across ${pluralize(totals.goals_count, 'goal')}`" icon="flag" />
+            <StatCard label="Remaining" :value="formatCurrency(totals.remaining)" hint="Still to save" icon="hourglass" />
             <StatCard
                 label="Goals"
                 :value="`${totals.active_goals} active`"
                 :hint="`${totals.completed_goals} completed`"
-                icon="check"
+                icon="listChecks"
             />
         </section>
 
         <!-- Charts -->
         <section class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div class="card p-5 lg:col-span-2">
-                <h2 class="font-semibold text-slate-900">Net savings per month</h2>
-                <p class="mb-4 text-xs text-slate-500">Deposits minus withdrawals, last {{ monthlyChart.length }} months</p>
+                <h2 class="font-semibold text-ink">Net savings per month</h2>
+                <p class="mb-4 text-xs text-ink-muted">Deposits minus withdrawals, last {{ monthlyChart.length }} months</p>
                 <BarChart
                     :data="monthlyChart"
                     :series="[{ key: 'net', label: 'Net saved', color: SERIES_COLORS[0] }]"
@@ -84,8 +87,8 @@ const topGoals = computed(() => [...(overview.value?.goal_progress ?? [])].sort(
             </div>
 
             <div class="card p-5">
-                <h2 class="font-semibold text-slate-900">Goal status</h2>
-                <p class="mb-4 text-xs text-slate-500">Completed vs. active goals</p>
+                <h2 class="font-semibold text-ink">Goal status</h2>
+                <p class="mb-4 text-xs text-ink-muted">Completed vs. active goals</p>
                 <DonutChart :segments="statusSegments" :center-value="formatPercent((totals.completed_goals / totals.goals_count) * 100)" center-label="completed" aria-label="Completed versus active goals" />
             </div>
         </section>
@@ -94,18 +97,18 @@ const topGoals = computed(() => [...(overview.value?.goal_progress ?? [])].sort(
             <!-- Progress per goal -->
             <div class="card p-5 lg:col-span-2">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="font-semibold text-slate-900">Goal progress</h2>
-                    <RouterLink :to="{ name: 'goals.index' }" class="text-sm font-medium text-emerald-700 hover:underline">View all</RouterLink>
+                    <h2 class="font-semibold text-ink">Goal progress</h2>
+                    <RouterLink :to="{ name: 'goals.index' }" class="text-sm font-medium text-accent hover:underline">View all</RouterLink>
                 </div>
                 <ul class="flex flex-col gap-4">
                     <li v-for="goal in topGoals" :key="goal.id">
                         <RouterLink :to="{ name: 'goals.show', params: { id: goal.id } }" class="group block">
                             <div class="mb-1.5 flex justify-between gap-2 text-sm">
-                                <span class="truncate font-medium text-slate-800 group-hover:text-emerald-700">{{ goal.name }}</span>
-                                <span class="text-slate-600 tabular-nums">{{ formatPercent(goal.progress) }}</span>
+                                <span class="truncate font-medium text-ink group-hover:text-accent" :title="goal.name">{{ goal.name }}</span>
+                                <span class="text-ink-soft tabular-nums">{{ formatPercent(goal.progress) }}</span>
                             </div>
                             <ProgressBar :value="goal.progress" :completed="goal.status === 'completed'" :label="`${goal.name} progress`" />
-                            <p class="mt-1 text-xs text-slate-500 tabular-nums">
+                            <p class="mt-1 text-xs text-ink-muted tabular-nums">
                                 {{ formatCurrency(goal.saved_amount) }} of {{ formatCurrency(goal.target_amount) }}
                             </p>
                         </RouterLink>
@@ -116,8 +119,8 @@ const topGoals = computed(() => [...(overview.value?.goal_progress ?? [])].sort(
             <!-- Recent activity -->
             <div class="card lg:col-span-3">
                 <div class="flex items-center justify-between px-5 pt-5 pb-2">
-                    <h2 class="font-semibold text-slate-900">Recent activity</h2>
-                    <RouterLink :to="{ name: 'reports' }" class="text-sm font-medium text-emerald-700 hover:underline">Full history</RouterLink>
+                    <h2 class="font-semibold text-ink">Recent activity</h2>
+                    <RouterLink :to="{ name: 'reports' }" class="text-sm font-medium text-accent hover:underline">Full history</RouterLink>
                 </div>
                 <TransactionTable v-if="overview.recent_activities.length" :transactions="overview.recent_activities" show-goal />
                 <StateMessage v-else message="No savings logged yet. Open a goal to add your first saving." />

@@ -16,27 +16,27 @@ const routes = [
         path: '/goals',
         name: 'goals.index',
         component: () => import('../pages/goals/GoalListPage.vue'),
-        meta: { title: 'Savings Goals' },
+        meta: { title: 'Savings goals' },
     },
     {
         path: '/goals/new',
         name: 'goals.create',
         component: () => import('../pages/goals/GoalFormPage.vue'),
-        meta: { title: 'New Goal' },
+        meta: { title: 'New goal' },
     },
     {
         path: '/goals/:id(\\d+)',
         name: 'goals.show',
         component: () => import('../pages/goals/GoalDetailPage.vue'),
         props: (route) => ({ id: Number(route.params.id) }),
-        meta: { title: 'Goal Details' },
+        meta: { title: 'Goal details' },
     },
     {
         path: '/goals/:id(\\d+)/edit',
         name: 'goals.edit',
         component: () => import('../pages/goals/GoalFormPage.vue'),
         props: (route) => ({ id: Number(route.params.id) }),
-        meta: { title: 'Edit Goal' },
+        meta: { title: 'Edit goal' },
     },
     {
         path: '/reports',
@@ -48,7 +48,7 @@ const routes = [
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../pages/NotFoundPage.vue'),
-        meta: { title: 'Page Not Found' },
+        meta: { title: 'Page not found' },
     },
 ];
 

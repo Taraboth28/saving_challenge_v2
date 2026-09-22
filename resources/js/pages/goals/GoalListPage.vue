@@ -6,8 +6,11 @@ import AppIcon from '../../components/ui/AppIcon.vue';
 import PageHeader from '../../components/ui/PageHeader.vue';
 import StateMessage from '../../components/ui/StateMessage.vue';
 import { useAsyncData } from '../../composables/useAsyncData';
+import { onDataChanged } from '../../composables/useDataChanged';
 
 const { data: goals, loading, error, reload } = useAsyncData(() => goalsApi.list(), { initialData: [] });
+
+onDataChanged(reload);
 
 const statusFilter = ref('all');
 const search = ref('');
@@ -38,7 +41,7 @@ const visibleGoals = computed(() => {
     </PageHeader>
 
     <div v-if="goals.length" class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Filter by status">
+        <div class="flex gap-1 rounded-lg bg-surface-muted p-1" role="tablist" aria-label="Filter by status">
             <button
                 v-for="tab in tabs"
                 :key="tab.value"
@@ -46,10 +49,10 @@ const visibleGoals = computed(() => {
                 role="tab"
                 :aria-selected="statusFilter === tab.value"
                 class="rounded-md px-3 py-1.5 text-sm font-medium transition"
-                :class="statusFilter === tab.value ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+                :class="statusFilter === tab.value ? 'bg-surface text-ink shadow-sm' : 'text-ink-soft hover:text-ink'"
                 @click="statusFilter = tab.value"
             >
-                {{ tab.label }} <span class="text-slate-400 tabular-nums">{{ tab.count }}</span>
+                {{ tab.label }} <span class="text-ink-muted tabular-nums">{{ tab.count }}</span>
             </button>
         </div>
         <input v-model="search" type="search" class="input sm:max-w-xs" placeholder="Search goals…" aria-label="Search goals" />

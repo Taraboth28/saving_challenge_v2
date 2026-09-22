@@ -11,32 +11,32 @@ defineProps({
 <template>
     <RouterLink
         :to="{ name: 'goals.show', params: { id: goal.id } }"
-        class="card group flex flex-col gap-4 p-5 transition hover:border-emerald-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-emerald-600"
+        class="card group flex flex-col gap-4 p-5 transition hover:border-orange-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-orange-600"
     >
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-                <h3 class="truncate font-semibold text-slate-900 group-hover:text-emerald-700">{{ goal.name }}</h3>
-                <p class="mt-0.5 text-xs text-slate-500">{{ describeDaysLeft(goal) }}</p>
+                <h3 :title="goal.name" class="truncate font-semibold text-ink group-hover:text-accent">{{ goal.name }}</h3>
+                <p class="mt-0.5 text-xs text-ink-muted">{{ describeDaysLeft(goal) }}</p>
             </div>
             <StatusBadge :status="goal.status" :overdue="goal.is_overdue" />
         </div>
 
         <div>
             <div class="mb-2 flex items-baseline justify-between">
-                <span class="text-xl font-semibold text-slate-900 tabular-nums">{{ formatCurrency(goal.saved_amount) }}</span>
-                <span class="text-sm font-medium text-slate-600 tabular-nums">{{ formatPercent(goal.progress) }}</span>
+                <span class="text-xl font-semibold text-ink tabular-nums">{{ formatCurrency(goal.saved_amount) }}</span>
+                <span class="text-sm font-medium text-ink-soft tabular-nums">{{ formatPercent(goal.progress) }}</span>
             </div>
             <ProgressBar :value="goal.progress" :completed="goal.status === 'completed'" :label="`${goal.name} progress`" />
         </div>
 
         <dl class="grid grid-cols-2 gap-2 text-xs">
             <div>
-                <dt class="text-slate-500">Target</dt>
-                <dd class="font-medium text-slate-800 tabular-nums">{{ formatCurrency(goal.target_amount) }}</dd>
+                <dt class="text-ink-muted">Target</dt>
+                <dd class="font-medium text-ink tabular-nums">{{ formatCurrency(goal.target_amount) }}</dd>
             </div>
             <div class="text-right">
-                <dt class="text-slate-500">Remaining</dt>
-                <dd class="font-medium text-slate-800 tabular-nums">{{ formatCurrency(goal.remaining_amount) }}</dd>
+                <dt class="text-ink-muted">Remaining</dt>
+                <dd class="font-medium text-ink tabular-nums">{{ formatCurrency(goal.remaining_amount) }}</dd>
             </div>
         </dl>
     </RouterLink>

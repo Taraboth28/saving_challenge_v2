@@ -4,6 +4,8 @@ import { transactionsApi } from '../../api/transactions';
 import { useForm } from '../../composables/useForm';
 import { todayIso } from '../../utils/format';
 import BaseModal from '../ui/BaseModal.vue';
+import BaseSelect from '../ui/BaseSelect.vue';
+import DatePicker from '../ui/DatePicker.vue';
 import FormField from '../ui/FormField.vue';
 
 /**
@@ -28,7 +30,10 @@ const blank = () => ({
 });
 
 const form = useForm(blank());
+const goalOptions = computed(() => props.goals.map((goal) => ({ value: goal.id, label: goal.name })));
 const isEditing = computed(() => props.transaction !== null);
+/** Opened without a goal (e.g. from the navigation) while no goals exist yet. */
+const needsGoal = computed(() => !isEditing.value && props.goalId === null && props.goals.length === 0);
 
 watch(
     () => props.open,
@@ -51,13 +56,17 @@ async function submit() {
 
 <template>
     <BaseModal :open="open" :title="isEditing ? 'Edit transaction' : 'Add saving'" @close="emit('close')">
-        <form class="flex flex-col gap-4" novalidate @submit.prevent="submit">
-            <p v-if="form.message.value" class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">{{ form.message.value }}</p>
+        <div v-if="needsGoal" class="flex flex-col items-center gap-3 py-4 text-center">
+            <p class="font-medium text-ink">Create a goal first</p>
+            <p class="max-w-xs text-sm text-ink-muted">Savings are added to a goal. Set one up with a target amount, then come back to add your first saving.</p>
+            <RouterLink :to="{ name: 'goals.create' }" class="btn btn-primary mt-2" @click="emit('close')">Create a goal</RouterLink>
+        </div>
+
+        <form v-else class="flex flex-col gap-4" novalidate @submit.prevent="submit">
+            <p v-if="form.message.value" class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300" role="alert">{{ form.message.value }}</p>
 
             <FormField v-if="goals.length" label="Goal" for="tx-goal" :error="form.error('goal_id')">
-                <select id="tx-goal" v-model="form.values.goal_id" class="input">
-                    <option v-for="goal in goals" :key="goal.id" :value="goal.id">{{ goal.name }}</option>
-                </select>
+                <BaseSelect id="tx-goal" v-model="form.values.goal_id" :options="goalOptions" placeholder="Choose a goal" />
             </FormField>
 
             <fieldset>
@@ -69,14 +78,14 @@ async function submit() {
                             { value: 'withdrawal', label: 'Withdrawal' },
                         ]"
                         :key="option.value"
-                        class="flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium transition has-focus-visible:outline-2 has-focus-visible:outline-emerald-600"
-                        :class="form.values.type === option.value ? 'border-emerald-600 bg-emerald-50 text-emerald-700' : 'border-slate-300 text-slate-600 hover:bg-slate-50'"
+                        class="flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium transition has-focus-visible:outline-2 has-focus-visible:outline-orange-600"
+                        :class="form.values.type === option.value ? 'border-orange-600 bg-orange-500/10 text-accent' : 'border-line-strong text-ink-soft hover:bg-surface-muted'"
                     >
                         <input v-model="form.values.type" type="radio" name="tx-type" :value="option.value" class="sr-only" />
                         {{ option.label }}
                     </label>
                 </div>
-                <p v-if="form.error('type')" class="mt-1 text-sm text-rose-600">{{ form.error('type') }}</p>
+                <p v-if="form.error('type')" class="mt-1 text-sm text-rose-600 dark:text-rose-400">{{ form.error('type') }}</p>
             </fieldset>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -85,7 +94,7 @@ async function submit() {
                 </FormField>
 
                 <FormField label="Date" for="tx-date" :error="form.error('date')">
-                    <input id="tx-date" v-model="form.values.date" class="input" type="date" :max="todayIso()" required />
+                    <DatePicker id="tx-date" v-model="form.values.date" :max="todayIso()" />
                 </FormField>
             </div>
 

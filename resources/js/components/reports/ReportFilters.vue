@@ -1,6 +1,8 @@
 <script setup>
-import { reactive, watch } from 'vue';
-import { todayIso } from '../../utils/format';
+import { computed, reactive, watch } from 'vue';
+import { toIsoDate, todayIso } from '../../utils/format';
+import BaseSelect from '../ui/BaseSelect.vue';
+import DatePicker from '../ui/DatePicker.vue';
 
 /**
  * Date-range + goal filter row. Emits `update:modelValue` with { from, to, goal_id }.
@@ -23,8 +25,10 @@ function isoDaysAgo(days) {
     const date = new Date();
     date.setDate(date.getDate() - days);
 
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    return toIsoDate(date);
 }
+
+const goalOptions = computed(() => [{ value: '', label: 'All goals' }, ...props.goals.map((goal) => ({ value: goal.id, label: goal.name }))]);
 
 const presets = [
     { label: '30 days', range: () => ({ from: isoDaysAgo(29), to: todayIso() }) },
@@ -44,27 +48,24 @@ function apply(changes = {}) {
         <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
                 <label for="filter-from" class="label">From</label>
-                <input id="filter-from" v-model="filters.from" type="date" class="input" :max="filters.to || undefined" @change="apply()" />
+                <DatePicker id="filter-from" :model-value="filters.from" :max="filters.to || todayIso()" placeholder="Beginning" clearable @update:model-value="(from) => apply({ from })" />
             </div>
             <div>
                 <label for="filter-to" class="label">To</label>
-                <input id="filter-to" v-model="filters.to" type="date" class="input" :min="filters.from || undefined" @change="apply()" />
+                <DatePicker id="filter-to" :model-value="filters.to" :min="filters.from" placeholder="Today" clearable @update:model-value="(to) => apply({ to })" />
             </div>
             <div>
                 <label for="filter-goal" class="label">Goal</label>
-                <select id="filter-goal" v-model="filters.goal_id" class="input" @change="apply()">
-                    <option value="">All goals</option>
-                    <option v-for="goal in goals" :key="goal.id" :value="goal.id">{{ goal.name }}</option>
-                </select>
+                <BaseSelect id="filter-goal" :model-value="filters.goal_id" :options="goalOptions" @update:model-value="(goal_id) => apply({ goal_id })" />
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-label="Date range presets">
+        <div class="flex flex-wrap gap-1 rounded-lg bg-surface-muted p-1" role="group" aria-label="Date range presets">
             <button
                 v-for="preset in presets"
                 :key="preset.label"
                 type="button"
-                class="rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"
+                class="rounded-md px-3 py-1.5 text-xs font-medium text-ink-soft transition hover:bg-surface hover:text-ink"
                 @click="apply(preset.range())"
             >
                 {{ preset.label }}

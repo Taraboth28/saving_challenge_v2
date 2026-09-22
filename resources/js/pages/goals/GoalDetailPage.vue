@@ -12,6 +12,8 @@ import ProgressBar from '../../components/ui/ProgressBar.vue';
 import StateMessage from '../../components/ui/StateMessage.vue';
 import StatusBadge from '../../components/ui/StatusBadge.vue';
 import { useAsyncData } from '../../composables/useAsyncData';
+import { onDataChanged } from '../../composables/useDataChanged';
+import { useSavingsPulse } from '../../composables/useSavingsPulse';
 import { describeDaysLeft, formatCurrency, formatDate, formatPercent } from '../../utils/format';
 
 const props = defineProps({
@@ -22,6 +24,14 @@ const router = useRouter();
 const { data, loading, error, reload } = useAsyncData(() => goalsApi.find(props.id));
 
 watch(() => props.id, reload);
+onDataChanged(reload);
+
+const { refresh: refreshPulse } = useSavingsPulse();
+
+/** Reload the goal and the navigation's live savings progress after a change. */
+async function onTransactionsChanged() {
+    await Promise.all([reload(), refreshPulse()]);
+}
 
 const goal = computed(() => data.value?.goal);
 const transactions = computed(() => data.value?.transactions ?? []);
@@ -50,7 +60,7 @@ async function confirmDelete() {
             router.push({ name: 'goals.index' });
         } else {
             await transactionsApi.remove(pendingDelete.value.transaction.id);
-            await reload();
+            await onTransactionsChanged();
         }
         pendingDelete.value = null;
     } catch (caught) {
@@ -83,7 +93,7 @@ const dailyNeeded = computed(() => {
     <template v-else-if="goal">
         <PageHeader :title="goal.name" :description="goal.description || ''">
             <template #back>
-                <RouterLink :to="{ name: 'goals.index' }" class="mb-2 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
+                <RouterLink :to="{ name: 'goals.index' }" class="mb-2 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink">
                     <AppIcon name="arrowLeft" :size="16" />
                     All goals
                 </RouterLink>
@@ -94,10 +104,10 @@ const dailyNeeded = computed(() => {
                     Add saving
                 </button>
                 <RouterLink :to="{ name: 'goals.edit', params: { id: goal.id } }" class="btn btn-secondary">
-                    <AppIcon name="edit" :size="16" />
+                    <AppIcon name="pencil" :size="16" />
                     Edit
                 </RouterLink>
-                <button type="button" class="btn btn-secondary hover:text-rose-600" @click="pendingDelete = { kind: 'goal' }">
+                <button type="button" class="btn btn-secondary hover:text-rose-600 dark:hover:text-rose-400" @click="pendingDelete = { kind: 'goal' }">
                     <AppIcon name="trash" :size="16" />
                     Delete
                 </button>
@@ -109,15 +119,15 @@ const dailyNeeded = computed(() => {
             <section class="card p-6">
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <p class="text-sm text-slate-500">Saved so far</p>
-                        <p class="text-3xl font-semibold text-slate-900 tabular-nums">
+                        <p class="text-sm text-ink-muted">Saved so far</p>
+                        <p class="text-3xl font-semibold text-ink tabular-nums">
                             {{ formatCurrency(goal.saved_amount) }}
-                            <span class="text-base font-normal text-slate-500">of {{ formatCurrency(goal.target_amount) }}</span>
+                            <span class="text-base font-normal text-ink-muted">of {{ formatCurrency(goal.target_amount) }}</span>
                         </p>
                     </div>
                     <div class="flex items-center gap-3">
                         <StatusBadge :status="goal.status" :overdue="goal.is_overdue" />
-                        <span class="text-2xl font-semibold text-emerald-700 tabular-nums">{{ formatPercent(goal.progress) }}</span>
+                        <span class="text-2xl font-semibold text-accent tabular-nums">{{ formatPercent(goal.progress) }}</span>
                     </div>
                 </div>
 
@@ -125,21 +135,21 @@ const dailyNeeded = computed(() => {
 
                 <dl class="mt-6 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
                     <div>
-                        <dt class="text-slate-500">Remaining</dt>
-                        <dd class="font-semibold text-slate-900 tabular-nums">{{ formatCurrency(goal.remaining_amount) }}</dd>
+                        <dt class="text-ink-muted">Remaining</dt>
+                        <dd class="font-semibold text-ink tabular-nums">{{ formatCurrency(goal.remaining_amount) }}</dd>
                     </div>
                     <div>
-                        <dt class="text-slate-500">Target date</dt>
-                        <dd class="font-semibold text-slate-900">{{ formatDate(goal.target_date) }}</dd>
-                        <dd class="text-xs" :class="goal.is_overdue ? 'text-amber-700' : 'text-slate-500'">{{ describeDaysLeft(goal) }}</dd>
+                        <dt class="text-ink-muted">Target date</dt>
+                        <dd class="font-semibold text-ink">{{ formatDate(goal.target_date) }}</dd>
+                        <dd class="text-xs" :class="goal.is_overdue ? 'text-amber-700 dark:text-amber-400' : 'text-ink-muted'">{{ describeDaysLeft(goal) }}</dd>
                     </div>
                     <div>
-                        <dt class="text-slate-500">Transactions</dt>
-                        <dd class="font-semibold text-slate-900 tabular-nums">{{ goal.transactions_count }}</dd>
+                        <dt class="text-ink-muted">Transactions</dt>
+                        <dd class="font-semibold text-ink tabular-nums">{{ goal.transactions_count }}</dd>
                     </div>
                     <div>
-                        <dt class="text-slate-500">{{ dailyNeeded ? 'Needed per day' : 'Last saving' }}</dt>
-                        <dd class="font-semibold text-slate-900 tabular-nums">
+                        <dt class="text-ink-muted">{{ dailyNeeded ? 'Needed per day' : 'Last saving' }}</dt>
+                        <dd class="font-semibold text-ink tabular-nums">
                             {{ dailyNeeded ? formatCurrency(dailyNeeded) : formatDate(goal.last_activity_at) }}
                         </dd>
                     </div>
@@ -149,7 +159,7 @@ const dailyNeeded = computed(() => {
             <!-- History -->
             <section class="card">
                 <div class="flex items-center justify-between px-5 pt-5 pb-2">
-                    <h2 class="font-semibold text-slate-900">Saving history</h2>
+                    <h2 class="font-semibold text-ink">Saving history</h2>
                 </div>
                 <TransactionTable
                     v-if="transactions.length"
@@ -169,7 +179,7 @@ const dailyNeeded = computed(() => {
             :transaction="editingTransaction"
             :goal-id="goal.id"
             @close="transactionModalOpen = false"
-            @saved="reload"
+            @saved="onTransactionsChanged"
         />
 
         <ConfirmDialog

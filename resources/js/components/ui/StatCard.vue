@@ -11,11 +11,13 @@ defineProps({
 
 <template>
     <div class="card flex flex-col gap-2 p-5">
-        <div class="flex items-center justify-between text-sm text-slate-500">
+        <div class="flex items-center justify-between text-sm text-ink-muted">
             <span>{{ label }}</span>
-            <AppIcon v-if="icon" :name="icon" :size="18" class="text-slate-400" />
+            <span v-if="icon" class="grid size-9 shrink-0 place-items-center rounded-xl bg-orange-500/10 text-accent">
+                <AppIcon :name="icon" :size="20" />
+            </span>
         </div>
-        <p class="text-2xl font-semibold text-slate-900 tabular-nums">{{ value }}</p>
-        <p v-if="hint" class="text-xs text-slate-500">{{ hint }}</p>
+        <p class="text-2xl font-semibold text-ink tabular-nums">{{ value }}</p>
+        <p v-if="hint" class="text-xs text-ink-muted">{{ hint }}</p>
     </div>
 </template>

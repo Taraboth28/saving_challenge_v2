@@ -1,6 +1,7 @@
 <script setup>
 import { useForm } from '../../composables/useForm';
 import { todayIso } from '../../utils/format';
+import DatePicker from '../ui/DatePicker.vue';
 import FormField from '../ui/FormField.vue';
 
 /**
@@ -40,7 +41,7 @@ async function submit() {
 
 <template>
     <form class="card flex flex-col gap-5 p-6" novalidate @submit.prevent="submit">
-        <p v-if="form.message.value" class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">{{ form.message.value }}</p>
+        <p v-if="form.message.value" class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300" role="alert">{{ form.message.value }}</p>
 
         <FormField label="Goal name" for="name" :error="form.error('name')">
             <input id="name" v-model="form.values.name" class="input" type="text" maxlength="120" placeholder="e.g. Emergency fund" required autofocus />
@@ -56,11 +57,11 @@ async function submit() {
             </FormField>
 
             <FormField label="Target date" for="target_date" :error="form.error('target_date')" hint="Optional deadline">
-                <input id="target_date" v-model="form.values.target_date" class="input" type="date" :min="goal ? undefined : todayIso()" />
+                <DatePicker id="target_date" v-model="form.values.target_date" :min="goal ? '' : todayIso()" placeholder="No deadline" clearable />
             </FormField>
         </div>
 
-        <div class="flex justify-end gap-2 border-t border-slate-100 pt-5">
+        <div class="flex justify-end gap-2 border-t border-line pt-5">
             <button type="button" class="btn btn-secondary" @click="emit('cancel')">Cancel</button>
             <button type="submit" class="btn btn-primary" :disabled="form.processing.value">
                 {{ form.processing.value ? 'Saving…' : submitLabel }}

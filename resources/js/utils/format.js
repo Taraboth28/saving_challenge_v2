@@ -16,6 +16,11 @@ export function formatCurrency(amount, { compact = false } = {}) {
     return (compact ? compactCurrencyFormatter : currencyFormatter).format(Number(amount) || 0);
 }
 
+/** "1 goal", "3 goals". */
+export function pluralize(count, singular, plural = `${singular}s`) {
+    return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export function formatPercent(value) {
     return `${Number(value || 0).toLocaleString(appConfig.locale, { maximumFractionDigits: 1 })}%`;
 }
@@ -44,10 +49,13 @@ export function formatMonth(value, { short = false } = {}) {
     return parseDate(value).toLocaleDateString(appConfig.locale, short ? { month: 'short' } : { month: 'long', year: 'numeric' });
 }
 
-export function todayIso() {
-    const now = new Date();
+/** Local calendar date as YYYY-MM-DD (no UTC shift). */
+export function toIsoDate(date) {
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+}
 
-    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+export function todayIso() {
+    return toIsoDate(new Date());
 }
 
 export function describeDaysLeft(goal) {
@@ -60,8 +68,8 @@ export function describeDaysLeft(goal) {
     }
 
     if (goal.days_left < 0) {
-        return `${Math.abs(goal.days_left)} days overdue`;
+        return `${pluralize(Math.abs(goal.days_left), 'day')} overdue`;
     }
 
-    return goal.days_left === 0 ? 'Due today' : `${goal.days_left} days left`;
+    return goal.days_left === 0 ? 'Due today' : `${pluralize(goal.days_left, 'day')} left`;
 }

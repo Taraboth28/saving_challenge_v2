@@ -102,8 +102,8 @@ const tooltip = computed(() => {
             <!-- Grid + y axis -->
             <g class="text-[11px]">
                 <g v-for="tick in ticks" :key="tick">
-                    <line :x1="padding.left" :x2="width - padding.right" :y1="y(tick)" :y2="y(tick)" :stroke="tick === 0 ? '#94a3b8' : '#e2e8f0'" stroke-width="1" />
-                    <text :x="padding.left - 8" :y="y(tick)" text-anchor="end" dominant-baseline="middle" fill="#64748b">
+                    <line :x1="padding.left" :x2="width - padding.right" :y1="y(tick)" :y2="y(tick)" :stroke="tick === 0 ? 'var(--color-line-strong)' : 'var(--color-line)'" stroke-width="1" />
+                    <text :x="padding.left - 8" :y="y(tick)" text-anchor="end" dominant-baseline="middle" fill="var(--color-ink-muted)">
                         {{ (formatAxis ?? formatValue)(tick) }}
                     </text>
                 </g>
@@ -116,7 +116,7 @@ const tooltip = computed(() => {
                 :y="padding.top"
                 :width="bandWidth"
                 :height="plot.height"
-                fill="#f1f5f9"
+                fill="var(--color-surface-muted)"
             />
 
             <!-- Bars -->
@@ -131,7 +131,7 @@ const tooltip = computed(() => {
                 :y="height - 8"
                 text-anchor="middle"
                 class="text-[11px]"
-                fill="#64748b"
+                fill="var(--color-ink-muted)"
             >
                 {{ row.label }}
             </text>
@@ -154,21 +154,21 @@ const tooltip = computed(() => {
 
         <div
             v-if="tooltip"
-            class="pointer-events-none absolute top-0 z-10 min-w-40 -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-lg"
+            class="pointer-events-none absolute top-0 z-10 min-w-40 -translate-x-1/2 rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-lg"
             :style="{ left: `${tooltip.left}px` }"
         >
-            <p class="mb-1 font-semibold text-slate-800">{{ tooltip.row.tooltipLabel ?? tooltip.row.label }}</p>
-            <p v-for="serie in series" :key="serie.key" class="flex items-center justify-between gap-4 text-slate-600">
+            <p class="mb-1 font-semibold text-ink">{{ tooltip.row.tooltipLabel ?? tooltip.row.label }}</p>
+            <p v-for="serie in series" :key="serie.key" class="flex items-center justify-between gap-4 text-ink-soft">
                 <span class="flex items-center gap-1.5">
                     <span class="size-2 rounded-full" :style="{ background: serie.color }" />
                     {{ serie.label }}
                 </span>
-                <span class="font-medium text-slate-800 tabular-nums">{{ formatValue(tooltip.row.values[serie.key] ?? 0) }}</span>
+                <span class="font-medium text-ink tabular-nums">{{ formatValue(tooltip.row.values[serie.key] ?? 0) }}</span>
             </p>
         </div>
 
         <!-- Legend (only needed for 2+ series; a single series is named by the card title) -->
-        <div v-if="series.length > 1" class="mt-3 flex flex-wrap gap-4 text-xs text-slate-600">
+        <div v-if="series.length > 1" class="mt-3 flex flex-wrap gap-4 text-xs text-ink-soft">
             <span v-for="serie in series" :key="serie.key" class="flex items-center gap-1.5">
                 <span class="size-2.5 rounded-sm" :style="{ background: serie.color }" />
                 {{ serie.label }}

@@ -11,7 +11,7 @@ defineProps({
     <div>
         <label :for="$props.for" class="label">{{ label }}</label>
         <slot />
-        <p v-if="error" class="mt-1 text-sm text-rose-600">{{ error }}</p>
-        <p v-else-if="hint" class="mt-1 text-xs text-slate-500">{{ hint }}</p>
+        <p v-if="error" class="mt-1 text-sm text-rose-600 dark:text-rose-400">{{ error }}</p>
+        <p v-else-if="hint" class="mt-1 text-xs text-ink-muted">{{ hint }}</p>
     </div>
 </template>

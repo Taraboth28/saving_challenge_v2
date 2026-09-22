@@ -13,7 +13,7 @@ const width = computed(() => `${Math.min(100, Math.max(0, props.value))}%`);
 
 <template>
     <div
-        class="w-full overflow-hidden rounded-full bg-slate-100"
+        class="w-full overflow-hidden rounded-full bg-surface-muted"
         :class="size === 'lg' ? 'h-3' : 'h-2'"
         role="progressbar"
         :aria-label="label"
@@ -21,6 +21,6 @@ const width = computed(() => `${Math.min(100, Math.max(0, props.value))}%`);
         aria-valuemin="0"
         aria-valuemax="100"
     >
-        <div class="h-full rounded-full transition-[width] duration-500" :class="completed ? 'bg-emerald-600' : 'bg-emerald-500'" :style="{ width }" />
+        <div class="h-full rounded-full transition-[width] duration-500" :class="completed ? 'bg-ink' : 'bg-orange-500'" :style="{ width }" />
     </div>
 </template>

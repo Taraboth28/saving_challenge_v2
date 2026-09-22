@@ -5,36 +5,122 @@
 @source '../**/*.vue';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Night mode is class-based: <html class="dark"> (set by resources/js/composables/useTheme.js). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Semantic color tokens. Components use these (bg-surface, text-ink, border-line, …)
+ * instead of fixed grays, so day / night mode only has to swap the values below.
+ */
+:root {
+    color-scheme: light;
+    --theme-canvas: #f5f5f5;
+    --theme-surface: #ffffff;
+    --theme-surface-muted: #f5f5f5;
+    --theme-line: #e5e5e5;
+    --theme-line-strong: #d4d4d4;
+    --theme-ink: #0a0a0a;
+    --theme-ink-soft: #404040;
+    --theme-ink-muted: #737373;
+    --theme-accent: #c2410c;
+    --theme-series-1: #eb6834;
+    --theme-series-2: #2a78d6;
+}
+
+:root.dark {
+    color-scheme: dark;
+    --theme-canvas: #0a0a0a;
+    --theme-surface: #171717;
+    --theme-surface-muted: #262626;
+    --theme-line: #2e2e2e;
+    --theme-line-strong: #404040;
+    --theme-ink: #fafafa;
+    --theme-ink-soft: #d4d4d4;
+    --theme-ink-muted: #a3a3a3;
+    --theme-accent: #fb923c;
+    /* Dark-surface steps of the same validated series hues */
+    --theme-series-1: #d95926;
+    --theme-series-2: #3987e5;
+}
+
+@theme inline {
+    --color-canvas: var(--theme-canvas);
+    --color-surface: var(--theme-surface);
+    --color-surface-muted: var(--theme-surface-muted);
+    --color-line: var(--theme-line);
+    --color-line-strong: var(--theme-line-strong);
+    --color-ink: var(--theme-ink);
+    --color-ink-soft: var(--theme-ink-soft);
+    --color-ink-muted: var(--theme-ink-muted);
+    --color-accent: var(--theme-accent);
 
     /* Chart series (validated categorical slots 1–2, see components/charts) */
-    --color-series-1: #2a78d6;
-    --color-series-2: #eb6834;
+    --color-series-1: var(--theme-series-1);
+    --color-series-2: var(--theme-series-2);
+}
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Spring-like easing used by the Dynamic Island and pop animations */
+    --ease-spring: cubic-bezier(0.32, 1.25, 0.5, 1);
+
+    --animate-pop: pop 420ms var(--ease-spring) both;
+    --animate-island-in: island-in 600ms var(--ease-spring) both;
+
+    @keyframes pop {
+        0% {
+            transform: scale(0.85);
+            opacity: 0.4;
+        }
+        60% {
+            transform: scale(1.06);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes island-in {
+        0% {
+            transform: translateY(-24px) scale(0.6);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
 }
 
 @layer base {
+    /* Reserve the scrollbar's space so centered content (the Dynamic Island) never shifts between short and long pages. */
+    html {
+        scrollbar-gutter: stable;
+    }
+
     body {
-        @apply bg-slate-50 text-slate-800;
+        @apply bg-canvas text-ink-soft transition-colors duration-300;
     }
 }
 
 @layer components {
     .card {
-        @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+        @apply rounded-2xl border border-line bg-surface shadow-sm transition-colors duration-300;
     }
 
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
     }
 
     .btn-primary {
-        @apply bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:outline-emerald-600;
+        @apply bg-ink text-surface hover:bg-orange-500 hover:text-neutral-950 focus-visible:outline-orange-500;
     }
 
     .btn-secondary {
-        @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:outline-slate-400;
+        @apply border border-line-strong bg-surface text-ink-soft hover:bg-surface-muted focus-visible:outline-neutral-400;
     }
 
     .btn-danger {
@@ -42,15 +128,15 @@
     }
 
     .btn-ghost {
-        @apply px-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-slate-400;
+        @apply px-2 text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-neutral-400;
     }
 
     .input {
-        @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 focus:outline-none;
+        @apply block w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30 focus:outline-none;
     }
 
     .label {
-        @apply mb-1 block text-sm font-medium text-slate-700;
+        @apply mb-1 block text-sm font-medium text-ink-soft;
     }
 
     .table-base {
@@ -58,10 +144,15 @@
     }
 
     .table-base th {
-        @apply border-b border-slate-200 px-4 py-3 text-xs font-semibold tracking-wide text-slate-500 uppercase;
+        @apply border-b border-line px-4 py-3 text-xs font-semibold tracking-wide text-ink-muted uppercase;
+    }
+
+    /* Row headers (<th scope="row">) read as body text, not as column headings. */
+    .table-base tbody th {
+        @apply border-line text-sm font-medium tracking-normal text-ink normal-case;
     }
 
     .table-base td {
-        @apply border-b border-slate-100 px-4 py-3;
+        @apply border-b border-line px-4 py-3;
     }
 }
