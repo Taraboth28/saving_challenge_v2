@@ -5,6 +5,14 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Netlify cannot run the Laravel API, so /api/* must not fall through to index.html
+# (an HTML "200 OK" there makes the app misread the page as data).
+[[redirects]]
+  from = "/api/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 # SPA fallback so client-side routes don't 404
 [[redirects]]
   from = "/*"

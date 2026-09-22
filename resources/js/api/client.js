@@ -49,6 +49,15 @@ async function request(method, path, { query, body } = {}) {
         return null;
     }
 
+    // A non-JSON answer means no API is behind this URL — e.g. static hosting (Netlify)
+    // serving an HTML page instead of the Laravel backend.
+    if (!response.headers.get('content-type')?.includes('application/json')) {
+        throw new ApiError(
+            'The savings server is not available. This site needs its Laravel backend running to load and save data.',
+            response.status,
+        );
+    }
+
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
