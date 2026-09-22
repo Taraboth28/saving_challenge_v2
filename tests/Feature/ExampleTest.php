@@ -2,18 +2,20 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_spa_routes_render_the_vue_shell(): void
     {
-        $response = $this->get('/');
+        $this->withoutVite();
 
-        $response->assertStatus(200);
+        $this->get('/')->assertOk()->assertSee('id="app"', false);
+        $this->get('/goals/5/edit')->assertOk()->assertSee('id="app"', false);
+    }
+
+    public function test_unknown_api_routes_return_json_not_found(): void
+    {
+        $this->getJson('/api/v1/unknown')->assertNotFound();
     }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('app');
-});
+/*
+ * The Vue router owns every non-API path.
+ */
+Route::view('/{any?}', 'app')->where('any', '^(?!api(/|$)|up$).*$')->name('app');
